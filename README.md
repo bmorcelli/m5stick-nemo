@@ -11,6 +11,8 @@ NEMO is named after the small, clever and stubborn fish in Finding Nemo. This pr
 ![M5-Nemo on M5StickC family and M5Cardputer](https://github.com/n0xa/m5stick-nemo/blob/main/M5-Nemo.jpg)
 
 ## My changelog
+* Added support to battery Status to non AXP models, such as M5StickC Plus 2, that uses M5Unified library
+* Added support to M5StickC Plus 2 on songs.h 
 * Added an "Attack Menu" when seeing details of an Access Point
 - Clone Portal (Creates an Evil portal with the same SSID of the target)
 - Deauth attack (broadcasts deauthentication frames to devices connected to this Access Point)
