@@ -9,7 +9,7 @@
                                               
                                               Robson Couto, 2019
 */
-
+#define NOTE_G5  784
 #define NOTE_C6  1047
 #define NOTE_CS6 1109
 #define NOTE_D6  1175
@@ -37,8 +37,8 @@ int melody[] = {
   // Score available at https://musescore.com/user/2123/scores/2145
   // Theme by Koji Kondo
   
-  NOTE_E6,8, NOTE_E6,8, REST,8, NOTE_E6,8, REST,8, NOTE_C6,8, NOTE_E6,8, //WRITE YOUR MELODY HERE
-  NOTE_G6,4, REST,4,
+  NOTE_E6,8, REST,16, NOTE_E6,8, REST,4, NOTE_E6,8, REST,4, NOTE_C6,8, NOTE_E6,8, //WRITE YOUR MELODY HERE
+  REST,8, NOTE_G6,4, REST,2, NOTE_G5,4,
 };
 
 // sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
@@ -65,23 +65,26 @@ void setupSongs() {
       noteDuration = (wholenote) / abs(divider);
       noteDuration *= 1.5; // increases the duration in half for dotted notes
     }
-
-
 #if defined(STICK_C_PLUS)
-    SPEAKER.tone(4000);
-    delay(noteDuration * 0.9);
+    // playing 2 octave up (2^2) due to proximity of frequencys
+    SPEAKER.tone(melody[thisNote]*4, noteDuration);
+    // Wait for the specief duration before playing the next note.
     delay(noteDuration);
-    SPEAKER.mute();
+
+    //SPEAKER.tone(4000);
+    //delay(noteDuration * 0.9);
+    //delay(noteDuration);
+    //SPEAKER.mute();
 #elif defined(CARDPUTER)
     // we only play the note for 90% of the duration, leaving 10% as a pause
     SPEAKER.tone(melody[thisNote], noteDuration * 0.9);
     // Wait for the specief duration before playing the next note.
     delay(noteDuration);
 #elif defined(STICK_C_PLUS2)
-    SPEAKER.tone(4000);
-    delay(noteDuration * 0.9);
+    // playing 2 octave up (2^2) due to proximity of frequencies and high noise on low freqs
+    SPEAKER.tone(melody[thisNote]*4, noteDuration);
+    // Wait for the specief duration before playing the next note.
     delay(noteDuration);
-    SPEAKER.stop();
 #endif
     
   }

@@ -60,6 +60,7 @@ String buildver="2.3.4b";
   //#define ACTIVE_LOW_IR
   #define ROTATION
   #define USE_EEPROM
+  #define BATTERY
   //#define RTC      //TODO: plus2 has a BM8563 RTC but the class isn't the same, needs work.
   #define SDCARD   //Requires a custom-built adapter and sd_stick.h file
   // -=-=- ALIASES -=-=-
@@ -134,6 +135,7 @@ String buildver="2.3.4b";
 // M5LED      - An LED exposed as M5_LED
 // RTC        - Real-time clock exposed as M5.Rtc 
 // AXP        - AXP192 Power Management exposed as M5.Axp
+// BATTERY    - M5 battery management used in M5Unified library (M5stickCPlus2)
 // KB         - Keyboard exposed as M5Cardputer.Keyboard
 // HID        - HID exposed as USBHIDKeyboard
 // USE_EEPROM - Store settings in EEPROM
@@ -497,7 +499,7 @@ void dmenu_loop() {
 /// SETTINGS MENU ///
 MENU smenu[] = {
   { TXT_BACK, 1},
-#if defined(AXP)
+#if defined(AXP) || defined(BATTERY)
   { TXT_BATT_INFO, 6},
 #endif
 #if defined(CARDPUTER)
@@ -655,6 +657,7 @@ int rotation = 1;
     float b = M5.Axp.GetVbatData() * 1.1 / 1000;
     int battery = ((b - 3.0) / 1.2) * 100;
     if (battery != oldbattery){
+      oldbattery = battery;
       battery_drawmenu(battery, b, c);
     }
     if (check_select_press()) {
@@ -665,6 +668,50 @@ int rotation = 1;
     oldbattery = battery;
   }
 #endif // AXP
+
+#if defined(BATTERY) // Function to see battery level on M5StickC_Plus2
+  /// BATTERY INFO ///
+  int oldbattery=0;
+  void battery_drawmenu(int battery, float b, float c) {
+    DISP.setTextSize(SMALL_TEXT);
+    DISP.fillScreen(BGCOLOR);
+    DISP.setCursor(0, 8, 1);
+    DISP.print(TXT_BATT);
+    DISP.print(battery);
+    DISP.println("%");
+    DISP.print("mVbat: ");
+    DISP.println(b);
+    DISP.print("mAbat: ");
+    DISP.println(c);
+    DISP.println("");
+    DISP.println(TXT_EXIT);
+  }
+  void battery_setup() {
+    rstOverride = false;
+    float c = M5.Power.getBatteryCurrent();
+    float b = M5.Power.getBatteryVoltage()/1000;
+    int battery = M5.Power.getBatteryLevel();
+    battery_drawmenu(battery, b, c);
+    delay(500); // Prevent switching after menu loads up
+  }
+
+  void battery_loop() {
+    delay(300);
+    float c = M5.Power.getBatteryCurrent();
+    float b = M5.Power.getBatteryVoltage()/1000;
+    int battery = M5.Power.getBatteryLevel();
+    if (battery != oldbattery){
+      oldbattery = battery;
+      battery_drawmenu(battery, b, c);
+    }
+    if (check_select_press()) {
+      rstOverride = false;
+      isSwitching = true;
+     current_proc = 1;
+    }
+    
+  }
+#endif // BATTERY
 
 #if defined(CARDPUTER)
   /// BATTERY INFO ///
@@ -2038,7 +2085,7 @@ void loop() {
       case 5:
         tvbgone_setup();
         break;
-#if defined(AXP)
+#if defined(AXP) || defined(BATTERY)
       case 6:
         battery_setup();
         break;
@@ -2123,7 +2170,7 @@ void loop() {
     case 5:
       tvbgone_loop();
       break;
-#if defined(AXP)
+#if defined(AXP) || defined(BATTERY)
     case 6:
       battery_loop();
       break;

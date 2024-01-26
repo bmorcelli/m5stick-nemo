@@ -15,8 +15,8 @@ To do that, we must change some flags on the board "platform.txt" file and decla
 * open the folder with the version of your board, it will be something like: 2.1.0, or 2.0.9, or whatever
 * in this floder, open the file "platform.txt", you will need to edit this badboy.
 * Ctrl+F and search for: build.extra_flags.esp32
-  - You will find a line that looks like that:  'build.extra_flags.esp32=-DARDUINO_USB_CDC_ON_BOOT=0'
-  - Add an "-w " after the =, or at the end of the line: 'build.extra_flags.esp32=-w -DARDUINO_USB_CDC_ON_BOOT=0'
+  - You will find a line that looks like that: "build.extra_flags.esp32=-DARDUINO_USB_CDC_ON_BOOT=0"
+  - Add an "-w " after the =, or at the end of the line: build.extra_flags.esp32=-w -DARDUINO_USB_CDC_ON_BOOT=0"
 * you should make these changes to the lines:
   - build.extra_flags.esp32
   - build.extra_flags.esp32s2
@@ -40,6 +40,6 @@ I Created a bash file to meka all these changes automatically, you just need to 
 It only works in windows environments
 
 
-## Helps?
+## My changelog
 I am accepting ports of this bach file to MAC and linux.
 
