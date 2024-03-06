@@ -3,7 +3,7 @@
 
 // -=-=-=-=-=-=- Uncomment the platform you're building for -=-=-=-=-=-=-
 // #define STICK_C_PLUS
-// #define STICK_C_PLUS2
+#define STICK_C_PLUS2
 // #define STICK_C
 // #define CARDPUTER
 // -=-=- Uncommenting more than one at a time will result in errors -=-=-
@@ -12,7 +12,7 @@
 // #define LANGUAGE_EN_US
 // #define LANGUAGE_PT_BR
 
-// -- DEPRECATED - THESE ARE NOW EEPROM DEFINED -- //
+// -- DEPRECATED - THESE ARE NOW SPIFFS DEFINED -- //
 uint16_t BGCOLOR=0x0001; // placeholder
 uint16_t FGCOLOR=0xFFF1; // placeholder
 
@@ -46,7 +46,7 @@ uint16_t FGCOLOR=0xFFF1; // placeholder
   #define AXP
   #define ACTIVE_LOW_IR
   #define ROTATION
-  #define USE_EEPROM
+  #define USE_SPIFFS
   #define SDCARD   //Requires a custom-built adapter
   // #define SONG
 
@@ -76,7 +76,7 @@ uint16_t FGCOLOR=0xFFF1; // placeholder
   #define ACTIVE_LOW_IR
   #define M5LED 19
   #define ROTATION
-  #define USE_EEPROM
+  #define USE_SPIFFS
   #define RTC      //TODO: plus2 has a BM8563 RTC but the class isn't the same, needs work.
   #define SDCARD   //Requires a custom-built adapter
   #define PWRMGMT
@@ -112,7 +112,7 @@ uint16_t FGCOLOR=0xFFF1; // placeholder
   #define RTC
   #define AXP
   #define ROTATION
-  #define USE_EEPROM
+  #define USE_SPIFFS
   #define SDCARD   //Requires a custom-built adapter
   // -=-=- ALIASES -=-=-
   #define DISP M5.Lcd
@@ -138,7 +138,7 @@ uint16_t FGCOLOR=0xFFF1; // placeholder
   #define KB
   #define HID
   #define ACTIVE_LOW_IR
-  #define USE_EEPROM
+  #define USE_SPIFFS
   #define SDCARD
   // -=-=- ALIASES -=-=-
   #define DISP M5Cardputer.Display
@@ -164,7 +164,7 @@ uint16_t FGCOLOR=0xFFF1; // placeholder
 // PWRMGMT    - StickC+2 Power Management exposed as M5.Power
 // KB         - Keyboard exposed as M5Cardputer.Keyboard
 // HID        - HID exposed as USBHIDKeyboard
-// USE_EEPROM - Store settings in EEPROM
+// USE_SPIFFS - Store settings in SPIFFS
 // ROTATION   - Allow screen to be rotated
 // DISP       - Set to the API's Display class
 // SDCARD     - Device has an SD Card Reader attached
@@ -250,9 +250,8 @@ bool clone_flg = false;
 // DEAUTH end
 
 
-#if defined(USE_EEPROM)
-  #include <EEPROM.h>
-  #define EEPROM_SIZE 64
+#if defined(USE_SPIFFS)
+  #include "spiffs_conf.h"
 #endif
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
@@ -522,9 +521,9 @@ void dmenu_loop() {
   }
   if (check_select_press()) {
     screen_dim_time = dmenu[cursor].command;
-    #if defined(USE_EEPROM)
-      EEPROM.write(1, screen_dim_time);
-      EEPROM.commit();
+    #if defined(USE_SPIFFS)
+      writeVariableToFile(1, screen_dim_time);
+      
     #endif
     DISP.fillScreen(BGCOLOR);
     DISP.setCursor(0, 0);
@@ -542,9 +541,9 @@ void dmenu_loop() {
        }
     }
     screenBrightness(10 * cursor);
-    #if defined(USE_EEPROM)
-      EEPROM.write(2, 10 * cursor);
-      EEPROM.commit();
+    #if defined(USE_SPIFFS)
+      writeVariableToFile(2, 10 * cursor);
+      
     #endif
     rstOverride = false;
     isSwitching = true;
@@ -576,7 +575,7 @@ MENU smenu[] = {
   { TXT_THEME, 23},
   { TXT_ABOUT, 10},
   { TXT_REBOOT, 98},
-#if defined(USE_EEPROM)
+#if defined(USE_SPIFFS)
   { TXT_CLR_SETTINGS, 99},
 #endif
 };
@@ -591,11 +590,8 @@ void smenu_setup() {
 }
 
 void clearSettings(){
-  #if defined(USE_EEPROM)
-  for(int i = 0; i < EEPROM_SIZE; i++) {
-    EEPROM.write(i, 255);
-  }
-  EEPROM.commit();
+  #if defined(USE_SPIFFS)
+  resetConfigFile();
   #endif
   screenBrightness(100);
   DISP.fillScreen(BLUE);
@@ -739,8 +735,8 @@ void color_setup() {
   DISP.setCursor(0, 0);
   DISP.println(String(TXT_SET_FGCOLOR));
   cursor = 0;
-  #if defined(USE_EEPROM)
-    cursor=EEPROM.read(4); // get current fg color
+  #if defined(USE_SPIFFS)
+    cursor=readConfigFile(4); // get current fg color
   #endif
   rstOverride = true;
   delay(1000);  
@@ -756,11 +752,11 @@ void color_loop() {
     delay(250);
   }
   if (check_select_press()) {
-    #if defined(USE_EEPROM)
-      Serial.printf("EEPROM WRITE (4) FGCOLOR: %d\n", cursor);
-      EEPROM.write(4, cursor);
-      EEPROM.commit();
-      cursor=EEPROM.read(5); // get current bg color
+    #if defined(USE_SPIFFS)
+      Serial.printf("SPIFFS WRITE (4) FGCOLOR: %d\n", cursor);
+      writeVariableToFile(4, cursor);
+      
+      cursor=readConfigFile(5); // get current bg color
     #endif
     DISP.fillScreen(BGCOLOR);
     DISP.setCursor(0, 0);
@@ -777,10 +773,10 @@ void color_loop() {
         delay(250);
        }
     }
-    #if defined(USE_EEPROM)
-      Serial.printf("EEPROM WRITE (5) BGCOLOR: %d\n", cursor);
-      EEPROM.write(5, cursor);
-      EEPROM.commit();
+    #if defined(USE_SPIFFS)
+      Serial.printf("SPIFFS WRITE (5) BGCOLOR: %d\n", cursor);
+      writeVariableToFile(5, cursor);
+      
     #endif
     rstOverride = false;
     isSwitching = true;
@@ -876,20 +872,20 @@ void theme_loop() {
         current_proc = 22;
         break;
       case 0:
-        #if defined(USE_EEPROM)
-          setcolor(true, EEPROM.read(4));
-          setcolor(false, EEPROM.read(5));
+        #if defined(USE_SPIFFS)
+          setcolor(true, readConfigFile(4));
+          setcolor(false, readConfigFile(5));
         #endif
         rstOverride = false;
         isSwitching = true;
         current_proc = 2;
         break;
       default:
-        #if defined(USE_EEPROM)
-          Serial.printf("EEPROM WRITE (4) FGCOLOR: %d\n", FGCOLOR);
-          EEPROM.write(4, FGCOLOR);
-          Serial.printf("EEPROM WRITE (5) BGCOLOR: %d\n", BGCOLOR);
-          EEPROM.write(5, BGCOLOR);
+        #if defined(USE_SPIFFS)
+          Serial.printf("SPIFFS WRITE (4) FGCOLOR: %d\n", FGCOLOR);
+          writeVariableToFile(4, FGCOLOR);
+          Serial.printf("SPIFFS WRITE (5) BGCOLOR: %d\n", BGCOLOR);
+          writeVariableToFile(5, BGCOLOR);
         #endif
         rstOverride = false;
         isSwitching = true;
@@ -929,9 +925,9 @@ int rotation = 1;
       isSwitching = true;
       rotation = rmenu[cursor].command;
       DISP.setRotation(rotation);
-      #if defined(USE_EEPROM)
-        EEPROM.write(0, rotation);
-        EEPROM.commit();
+      #if defined(USE_SPIFFS)
+        writeVariableToFile(0, rotation);
+        
       #endif
       current_proc = 2;
     }
@@ -1160,9 +1156,9 @@ void tvbgmenu_loop() {
       return;
     }
 
-    #if defined(USE_EEPROM)
-      EEPROM.write(3, region);
-      EEPROM.commit();
+    #if defined(USE_SPIFFS)
+      writeVariableToFile(3, region);
+      
     #endif
     rstOverride = false;
     isSwitching = true;
@@ -2373,35 +2369,43 @@ void setup() {
   if(check_next_press()){
     clearSettings();
   }
-  #if defined(USE_EEPROM)
-    EEPROM.begin(EEPROM_SIZE);
-    Serial.printf("EEPROM 0 - Rotation:   %d\n", EEPROM.read(0));
-    Serial.printf("EEPROM 1 - Dim Time:   %d\n", EEPROM.read(1));
-    Serial.printf("EEPROM 2 - Brightness: %d\n", EEPROM.read(2));
-    Serial.printf("EEPROM 3 - TVBG Reg:   %d\n", EEPROM.read(3));
-    Serial.printf("EEPROM 4 - FGColor:    %d\n", EEPROM.read(4));
-    Serial.printf("EEPROM 5 - BGColor:    %d\n", EEPROM.read(5));
-    if(EEPROM.read(0) > 3 || EEPROM.read(1) > 240 || EEPROM.read(2) > 100 || EEPROM.read(3) > 1 || EEPROM.read(4) > 19 || EEPROM.read(5) > 19) {
-      // Assume out-of-bounds settings are a fresh/corrupt EEPROM and write defaults for everything
-      Serial.println("EEPROM likely not properly configured. Writing defaults.");
-      #if defined(CARDPUTER)
-      EEPROM.write(0, 1);    // Right rotation for cardputer
-      #else
-      EEPROM.write(0, 3);    // Left rotation
-      #endif
-      EEPROM.write(1, 15);   // 15 second auto dim time
-      EEPROM.write(2, 100);  // 100% brightness
-      EEPROM.write(3, 0);    // TVBG NA Region
-      EEPROM.write(4, 11);   // FGColor Green
-      EEPROM.write(5, 1);    // BGcolor Black
-      EEPROM.commit();
+  #if defined(USE_SPIFFS)
+    if (!SPIFFS.begin(true)) {
+      Serial.println("Failed to mount SPIFFS");
+      return;
     }
-    rotation = EEPROM.read(0);
-    screen_dim_time = EEPROM.read(1);
-    brightness = EEPROM.read(2);
-    region = EEPROM.read(3);
-    setcolor(true, EEPROM.read(4));
-    setcolor(false, EEPROM.read(5));
+    // Verify Partition and
+    verifySpiffsPartition();
+    
+    if(readConfigFile(0)==0) resetConfigFile();
+
+    Serial.printf("SPIFFS 0 - Rotation:   %d\n", readConfigFile(0));
+    Serial.printf("SPIFFS 1 - Dim Time:   %d\n", readConfigFile(1));
+    Serial.printf("SPIFFS 2 - Brightness: %d\n", readConfigFile(2));
+    Serial.printf("SPIFFS 3 - TVBG Reg:   %d\n", readConfigFile(3));
+    Serial.printf("SPIFFS 4 - FGColor:    %d\n", readConfigFile(4));
+    Serial.printf("SPIFFS 5 - BGColor:    %d\n", readConfigFile(5));
+    if(readConfigFile(0) > 3 || readConfigFile(1) > 240 || readConfigFile(2) > 100 || readConfigFile(3) > 1 || readConfigFile(4) > 19 || readConfigFile(5) > 19) {
+      // Assume out-of-bounds settings are a fresh/corrupt SPIFFS and write defaults for everything
+      Serial.println("SPIFFS likely not properly configured. Writing defaults.");
+      #if defined(CARDPUTER)
+      writeVariableToFile(0, 1);    // Right rotation for cardputer
+      #else
+      writeVariableToFile(0, 3);    // Left rotation
+      #endif
+      writeVariableToFile(1, 15);   // 15 second auto dim time
+      writeVariableToFile(2, 100);  // 100% brightness
+      writeVariableToFile(3, 0);    // TVBG NA Region
+      writeVariableToFile(4, 11);   // FGColor Green
+      writeVariableToFile(5, 1);    // BGcolor Black
+      
+    }
+    rotation = readConfigFile(0);
+    screen_dim_time = readConfigFile(1);
+    brightness = readConfigFile(2);
+    region = readConfigFile(3);
+    setcolor(true, readConfigFile(4));
+    setcolor(false, readConfigFile(5));
   #endif
   getSSID();
   
