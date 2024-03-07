@@ -240,6 +240,7 @@ void writeVariableToFile(int index, uint16_t value) {
   }
   // Open the file and move the pointer to the beginning of the desired variable
   String line = configFile.readStringUntil('\n');
+  Serial.println("Antes de sobrescrever" + line);
   configFile.close();
    
   String tempvar;
@@ -269,6 +270,7 @@ void writeVariableToFile(int index, uint16_t value) {
        str_value = oss.str();
        line += String(str_value.c_str()); 
     }
+    oss.str("");
     line += ",";
   }
   line+="\n";
@@ -284,4 +286,3 @@ void writeVariableToFile(int index, uint16_t value) {
   configFile.println(line);
 
 }
-
