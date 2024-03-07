@@ -814,12 +814,12 @@ void theme_setup() {
 }
 
 void theme_loop() {
+  int fgcolor; //var to save the right number into eeprom
+  int bgcolor; //var to save the right number into eeprom
+               //as it is saving uint16_t value to eeprom and getting wrong color on restart
   if (check_next_press()) {
     cursor++;
     cursor = cursor % thmenu_size;
-    int fgcolor; //var to save the right number into eeprom
-    int bgcolor; //var to save the right number into eeprom
-                 //as it is saving uint16_t to eeprom and get wrong color on restart
     switch (thmenu[cursor].command){
       case 0:
         FGCOLOR=11;
