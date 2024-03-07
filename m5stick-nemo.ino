@@ -81,7 +81,7 @@ uint16_t FGCOLOR=0xFFF1; // placeholder
   #define SDCARD   //Requires a custom-built adapter
   #define PWRMGMT
   #define SPEAKER M5.Speaker
-  #define SONG
+  // #define SONG
   // -=-=- ALIASES -=-=-
   #define DISP M5.Lcd
   #define IRLED 19
@@ -868,7 +868,6 @@ void theme_loop() {
      }
     sfgcolor=FGCOLOR;
     sbgcolor=BGCOLOR;
-    Serial.println(sfgcolor);
     setcolor(true, FGCOLOR);
     setcolor(false, BGCOLOR);
     drawmenu(thmenu, thmenu_size);
@@ -896,8 +895,7 @@ void theme_loop() {
           EEPROM.write(4, sfgcolor);
           Serial.printf("EEPROM WRITE (5) BGCOLOR: %d\n", BGCOLOR);
           EEPROM.write(5, sbgcolor);
-          Serial.print("Cor escolhida: ");
-          Serial.println(sfgcolor);
+          EEPROM.commit();
         #endif
         rstOverride = false;
         isSwitching = true;
