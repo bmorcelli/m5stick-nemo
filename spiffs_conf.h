@@ -1,6 +1,6 @@
 #include "FS.h"
 #include "SPIFFS.h"
-#include <iostream>
+#include <String.h>
 #include <sstream>
 /* You only need to format SPIFFS the first time you run a
    test or else use the SPIFFS plugin to create a partition
