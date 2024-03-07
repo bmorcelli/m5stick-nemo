@@ -817,6 +817,9 @@ void theme_loop() {
   if (check_next_press()) {
     cursor++;
     cursor = cursor % thmenu_size;
+    int fgcolor; //var to save the right number into eeprom
+    int bgcolor; //var to save the right number into eeprom
+                 //as it is saving uint16_t to eeprom and get wrong color on restart
     switch (thmenu[cursor].command){
       case 0:
         FGCOLOR=11;
@@ -863,6 +866,8 @@ void theme_loop() {
         BGCOLOR=1;
         break;
      }
+    fgcolor=FGCOLOR;
+    bgcolor=BGCOLOR;
     setcolor(true, FGCOLOR);
     setcolor(false, BGCOLOR);
     drawmenu(thmenu, thmenu_size);
@@ -887,9 +892,9 @@ void theme_loop() {
       default:
         #if defined(USE_EEPROM)
           Serial.printf("EEPROM WRITE (4) FGCOLOR: %d\n", FGCOLOR);
-          EEPROM.write(4, FGCOLOR);
+          EEPROM.write(4, fgcolor);
           Serial.printf("EEPROM WRITE (5) BGCOLOR: %d\n", BGCOLOR);
-          EEPROM.write(5, BGCOLOR);
+          EEPROM.write(5, bgcolor);
         #endif
         rstOverride = false;
         isSwitching = true;
