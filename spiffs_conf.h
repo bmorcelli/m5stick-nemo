@@ -1,5 +1,7 @@
 #include "FS.h"
 #include "SPIFFS.h"
+#include <iostream>
+#include <sstream>
 /* You only need to format SPIFFS the first time you run a
    test or else use the SPIFFS plugin to create a partition
    https://github.com/me-no-dev/arduino-esp32fs-plugin */
@@ -240,26 +242,36 @@ void writeVariableToFile(int index, uint16_t value) {
   }
   // Open the file and move the pointer to the beginning of the desired variable
   String line = configFile.readStringUntil('\n');
+  configFile.close();
+   
   String tempvar;
   uint16_t var[MAX_SPIFFS_VAR];
   int i=0;
   int commaIndex;
+
   for(i=0; i<MAX_SPIFFS_VAR; i++) {
     commaIndex = line.indexOf(',');
     tempvar = line.substring(0, commaIndex);
     var[i]=tempvar.toInt();
     line = line.substring(commaIndex + 1);
   }
-    Serial.println("Antes de sobrescrever: " + line);
 
   line=""; // reset line
+
+  std::ostringstream oss;
   for(i=0; i<MAX_SPIFFS_VAR; i++) {
-    if (i==index) { line += value; }
-    else { line += var[i]; }
+    if (i==index) { 
+       oss << value;
+       line += oss.str(); 
+    }
+    else { 
+       oss << var[i];
+       line += oss.str(); 
+    }
     line += ",";
   }
   line+="\n";
-  configFile.close();
+
 
   configFile = SPIFFS.open(filename, FILE_WRITE);
   if (!configFile) {
