@@ -11,10 +11,6 @@
 // File name
 const char *filename = "/nemo.conf";
 
-
-
-
-
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     Serial.printf("Listing directory: %s\r\n", dirname);
 
@@ -103,12 +99,14 @@ void renameFile(fs::FS &fs, const char * path1, const char * path2){
     }
 }
 
-void deleteFile(fs::FS &fs, const char * path){
+bool deleteFile(fs::FS &fs, const char * path){
     Serial.printf("Deleting file: %s\r\n", path);
     if(fs.remove(path)){
         Serial.println("- file deleted");
+       return true;
     } else {
         Serial.println("- delete failed");
+       return false;
     }
 }
 
@@ -259,14 +257,17 @@ void writeVariableToFile(int index, uint16_t value) {
   line=""; // reset line
 
   std::ostringstream oss;
+  std::string str_value;
   for(i=0; i<MAX_SPIFFS_VAR; i++) {
     if (i==index) { 
        oss << value;
-       line += oss.str(); 
+       str_value = oss.str();
+       line += String(str_value.c_str()); 
     }
     else { 
        oss << var[i];
-       line += oss.str(); 
+       str_value = oss.str();
+       line += String(str_value.c_str()); 
     }
     line += ",";
   }
