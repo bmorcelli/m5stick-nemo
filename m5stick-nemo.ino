@@ -274,6 +274,8 @@ bool clone_flg = false;
   #include "esp_wifi.h"                                                             //DEAUTH
   wifi_ap_record_t ap_record;                                                       //DEAUTH
 #endif
+#include "usb.h"
+
 struct MENU {
   char name[19];
   int command;
