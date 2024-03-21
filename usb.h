@@ -85,7 +85,7 @@ void readFs(String folder) {
       String fileName = fullFileName.substring(fullFileName.lastIndexOf("/") + 1);
       String ext = fileName.substring(fileName.lastIndexOf(".") + 1);
       ext.toUpperCase();
-      if (ext.equals("BIN") == true) {
+      if (ext.equals("TXT") == true) {
         fileList[fileListCount] = fileName;
         fileListCount++;
       }
@@ -262,7 +262,7 @@ void usb_setup()
 	      LNDISP.fillScreen(BLACK);
 	      LNDISP.setCursor(0, 0);
 	      LNDISP.setTextColor(RED,WHITE);
-	      LNDISP.println("\nSD is empty or there\nare no .bin in root.\nExample: d:\\File.bin");
+	      LNDISP.println("\nSD is empty or there\nare no .txt in root.\nExample: d:\\badpayload.txt");
 	      delay(2000);
 	      readFs("/");
 	    } else {
