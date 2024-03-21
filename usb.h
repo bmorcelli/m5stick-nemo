@@ -12,6 +12,13 @@ USBHIDKeyboard Keyboard;
 #define MAX_FILES 256
 #define MAX_FOLDERS 256
 #define DEF_DELAY 100
+
+#define KEY_PAUSE 0xD0
+#define KEY_NUM_LOCK 0xDB
+#define KEY_PRINT_SCREEN 0xCE
+#define KEY_SCROLL_LOCK 0xCF
+#define KEY_MENU 0xED
+
 File fileRoot;
 File root;
 String PreFolder = "/";
@@ -139,17 +146,17 @@ void key_input(String bad_script = "/badpayload.txt")
       String lineContent = "";
       String Command = "";
       String Argument = "";
-      char Argchar;
+      char ArgChar;
       Keyboard.releaseAll();
       while (payloadFile.available()) {
-        lineContent = payloadfile.readStringUntil('\n');
+        lineContent = payloadFile.readStringUntil('\n');
         Command = lineContent.substring(0, lineContent.indexOf(' ')); // get the command
         Argument = lineContent.substring(lineContent.indexOf(' ') + 1); // get the argument
         ArgChar = Argument.charAt(0);
         if(Command=="REM") { Serial.println(" // " + Argument); }
-        else if(Command=="DELAY") delay(Arg.toInt());
+        else if(Command=="DELAY") delay(Argument.toInt());
         else if(Command=="DEFAULTDELAY" || Command=="DEFAULT_DELAY") delay(DEF_DELAY); //100ms
-        else if(Command=="STRING") Keyboard.print(Arg); 
+        else if(Command=="STRING") Keyboard.print(Argument); 
         else if(Command=="ENTER") Keyboard.press(KEY_RETURN);
         else if(Command=="GUI" || Command=="WINDOWS") {     Keyboard.press(KEY_LEFT_GUI); Keyboard.press(ArgChar); }
         else if(Command=="SHIFT") { Keyboard.press(KEY_LEFT_SHIFT); Keyboard.press(ArgChar); }
@@ -202,14 +209,13 @@ void key_input(String bad_script = "/badpayload.txt")
         else if(Command=="F10") Keyboard.press(KEY_F10);  
         else if(Command=="F11") Keyboard.press(KEY_F11);
         else if(Command=="F12") Keyboard.press(KEY_F12);
-        else Serial.println("Command:" + Comm + " not suported");
+        else Serial.println("Command:" + Command + " not suported");
 
         if(Command!="REM") delay(DEF_DELAY); //if command is not a comment, wait DEF_DELAY until next command (100ms)
         Keyboard.releaseAll();
       }
-
       payloadFile.close();
-      Keyboard.print(fileContent);
+      Serial.println("Finished badusb payload execution...");
     }
   } else {
     // rick
@@ -238,6 +244,7 @@ void usb_setup()
   DISP.setTextColor(WHITE, BGCOLOR);
   DISP.setCursor(0, 0);
   int rot = 3;
+  int dispfileCount = 8;
   String bad_script = "";
 
   while(1) {
@@ -259,58 +266,58 @@ void usb_setup()
 	      }
 	    }
 	    if (fileListCount == 0 && folderListCount == 0 && PreFolder == "/") {
-	      LNDISP.fillScreen(BLACK);
-	      LNDISP.setCursor(0, 0);
-	      LNDISP.setTextColor(RED,WHITE);
-	      LNDISP.println("\nSD is empty or there\nare no .txt in root.\nExample: d:\\badpayload.txt");
+	      DISP.fillScreen(BLACK);
+	      DISP.setCursor(0, 0);
+	      DISP.setTextColor(RED,WHITE);
+	      DISP.println("\nSD is empty or there\nare no .txt in root.\nExample: d:\\badpayload.txt");
 	      delay(2000);
 	      readFs("/");
 	    } else {
-	      LNDISP.fillScreen(BLACK);
-	      LNDISP.setCursor(0, 0);
+	      DISP.fillScreen(BLACK);
+	      DISP.setCursor(0, 0);
 	      for (int index = startIndex; index <= (endIndex + 1); index++) {
-	        LNDISP.setTextColor(WHITE, BLACK); // RESET BG COLOR TO BLACK
+	        DISP.setTextColor(WHITE, BLACK); // RESET BG COLOR TO BLACK
 	        if (index == selectIndex) {
 	          if (index == 0){
-	            LNDISP.setTextColor(BLACK, WHITE);
-	            LNDISP.print(">");
+	            DISP.setTextColor(BLACK, WHITE);
+	            DISP.print(">");
 	          } else if (index < folderListCount+1) {
-	            LNDISP.setTextColor(BLUE);  // folders selected in Blue
-	            LNDISP.print(">");
+	            DISP.setTextColor(BLUE);  // folders selected in Blue
+	            DISP.print(">");
 	          } else if (index < (folderListCount + fileListCount+1)){
-	            LNDISP.setTextColor(GREEN);  // files selected in Green
-	            LNDISP.print(">");
+	            DISP.setTextColor(GREEN);  // files selected in Green
+	            DISP.print(">");
 	          } else if (index == (folderListCount + fileListCount+1)){
 	            if (PreFolder != "/") {
-	              LNDISP.setTextColor(RED, WHITE);  // folders in yellow
-	              LNDISP.print("<");
+	              DISP.setTextColor(RED, WHITE);  // folders in yellow
+	              DISP.print("<");
 	            }
 	        }
 	        } else {
 		  if (index == 0){
-		    LNDISP.setTextColor(WHITE);
-		    LNDISP.print(" ");
+		    DISP.setTextColor(WHITE);
+		    DISP.print(" ");
 		  } else if (index < folderListCount+1) {
-	            LNDISP.setTextColor(YELLOW);  // folders in yellow
-	            LNDISP.print(" ");
+	            DISP.setTextColor(YELLOW);  // folders in yellow
+	            DISP.print(" ");
 	          } else if (index < (folderListCount + fileListCount+1)){
-	            LNDISP.setTextColor(WHITE);  // files in white
-	            LNDISP.print(" ");
+	            DISP.setTextColor(WHITE);  // files in white
+	            DISP.print(" ");
 	          } else if (index == (folderListCount + fileListCount+1)){
 	            if (PreFolder != "/") {
-	              LNDISP.setTextColor(RED, BLACK);  // folders in yellow
-	              LNDISP.print(" ");
+	              DISP.setTextColor(RED, BLACK);  // folders in yellow
+	              DISP.print(" ");
 	            }
 	          }
 	        }
 		if (index==0) {
-		  LNDISP.println(">> Send default    ");
+		  DISP.println(">> Send default    ");
 		} else if (index < folderListCount+1) {
-	          LNDISP.println(folderList[index-1].substring(0, 15) + "/");
+	          DISP.println(folderList[index-1].substring(0, 15) + "/");
 	        } else if (index < (folderListCount + fileListCount+1)) {
-	          LNDISP.println(fileList[index - folderListCount-1].substring(0, 16));
+	          DISP.println(fileList[index - folderListCount-1].substring(0, 16));
 	        } else if (PreFolder != "/") { 
-	          LNDISP.print("<< back            ");
+	          DISP.print("<< back            ");
 	          break;
 	        } else { break; } 
 	      }
@@ -384,11 +391,11 @@ void usb_setup()
 	#endif
 	  {
 	    if (selectIndex==0) { //when Default is selected
-			  LNDISP.fillScreen(BLACK);
+			  DISP.fillScreen(BLACK);
 			  #if defined(STICK_C) || defined(STICK_C_PLUS)
 			  M5.Axp.ScreenBreath(7);
 			  #else
-			  LNDISP.setBrightness(0);
+			  DISP.setBrightness(0);
 			  #endif
 			  bad_script = "/badpayload.txt";
 	      break;
