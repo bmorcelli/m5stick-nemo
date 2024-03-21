@@ -3,37 +3,37 @@
 #include <SPI.h>
 #include <time.h>
 
-
-#include <USBHIDKeyboard.h>
-
-USBHIDKeyboard Keyboard;
+#ifdef CARDPUTER
+	#include <USBHIDKeyboard.h>
+	USBHIDKeyboard Keyboard;
+#else
+	#include <Keyboard.h>
+#endif
 
 //#include <BleKeyboard.h>
 //BleKeyboard bleKeyboard;
 //
-#define MAX_FILES 256
-#define MAX_FOLDERS 256
-#define DEF_DELAY 100
 
-#define KEY_PAUSE 0xD0
-#define KEY_NUM_LOCK 0xDB
-#define KEY_PRINT_SCREEN 0xCE
-#define KEY_SCROLL_LOCK 0xCF
-#define KEY_MENU 0xED
-#define KEY_LEFT_CTRL  0x80
-#define KEY_LEFT_SHIFT 0x81
-#define KEY_LEFT_ALT   0x82
-#define KEY_LEFT_GUI   0x83
+#define KEYPAUSE 0xD0
+#define KEYNUM_LOCK 0xDB
+#define KEYPRINT_SCREEN 0xCE
+#define KEYSCROLL_LOCK 0xCF
+#define KEYCAPS_LOCK 0xC1
+#define KEYMENU 0xED
+#define KEYLEFT_CTRL  0x80
+#define KEYLEFT_SHIFT 0x81
+#define KEYLEFT_ALT   0x82
+#define KEYLEFT_GUI   0x83
 #define KEYBACKSPACE 0xB2
 #define KEYTAB       0xB3
-#define KEY_ENTER     0x28
-#define KEY_RETURN 0xB0
-#define KEY_INSERT 0xD1
-#define KEY_DELETE 0xD4
-#define KEY_HOME 0xD2
-#define KEY_END 0xD5
-#define KEY_PAGE_UP 0xD3
-#define KEY_PAGE_DOWN 0xD6
+#define KEYENTER     0x28
+#define KEYRETURN 0xB0
+#define KEYINSERT 0xD1
+#define KEYDELETE 0xD4
+#define KEYHOME 0xD2
+#define KEYEND 0xD5
+#define KEYPAGE_UP 0xD3
+#define KEYPAGE_DOWN 0xD6
 #define KEYUP_ARROW 0xDA
 #define KEYDOWN_ARROW 0xD9
 #define KEYLEFT_ARROW 0xD8
@@ -54,6 +54,9 @@ USBHIDKeyboard Keyboard;
 #define KEYF12 0xCD
 
 
+#define MAX_FILES 256
+#define MAX_FOLDERS 256
+#define DEF_DELAY 100
 File fileRoot;
 File root;
 String PreFolder = "/";
@@ -66,6 +69,10 @@ int startIndex;
 int endIndex;
 int selectIndex;
 bool needRedraw=true;
+
+
+
+
 
 /* Example of payload file
 
@@ -168,7 +175,7 @@ void readFs(String folder) {
 void key_input(String bad_script = "/badpayload.txt")
 {
   //The commented commands should be set in the payload file as not all payloads run the same thing
-  //Keyboard.press(KEY_LEFT_GUI);
+  //Keyboard.press(KEYLEFT_GUI);
   //Keyboard.press('r');
   //Keyboard.releaseAll();
   delay(1000);
@@ -192,19 +199,19 @@ void key_input(String bad_script = "/badpayload.txt")
         else if(Command=="DELAY") delay(Argument.toInt());
         else if(Command=="DEFAULTDELAY" || Command=="DEFAULT_DELAY") delay(DEF_DELAY); //100ms
         else if(Command=="STRING") Keyboard.print(Argument); 
-        else if(Command=="ENTER") Keyboard.press(KEY_RETURN);
-        else if(Command=="GUI" || Command=="WINDOWS") {     Keyboard.press(KEY_LEFT_GUI); Keyboard.press(ArgChar); }
-        else if(Command=="SHIFT") { Keyboard.press(KEY_LEFT_SHIFT); Keyboard.press(ArgChar); }
-        else if(Command=="ALT") { Keyboard.press(KEY_LEFT_ALT); Keyboard.press(ArgChar); }
-        else if(Command=="CTRL" || Command=="CONTROL") { Keyboard.press(KEY_LEFT_CTRL); Keyboard.press(ArgChar); }
+        else if(Command=="ENTER") Keyboard.press(KEYRETURN);
+        else if(Command=="GUI" || Command=="WINDOWS") {     Keyboard.press(KEYLEFT_GUI); Keyboard.press(ArgChar); }
+        else if(Command=="SHIFT") { Keyboard.press(KEYLEFT_SHIFT); Keyboard.press(ArgChar); }
+        else if(Command=="ALT") { Keyboard.press(KEYLEFT_ALT); Keyboard.press(ArgChar); }
+        else if(Command=="CTRL" || Command=="CONTROL") { Keyboard.press(KEYLEFT_CTRL); Keyboard.press(ArgChar); }
 
-        else if(Command=="CTRL-ALT") { Keyboard.press(KEY_LEFT_ALT); Keyboard.press(KEY_LEFT_CTRL); Keyboard.press(ArgChar); }
-        else if(Command=="CTRL-SHIFT") { Keyboard.press(KEY_LEFT_CTRL); Keyboard.press(KEY_LEFT_SHIFT); Keyboard.press(ArgChar); }
-        else if(Command=="ALT-SHIFT") { Keyboard.press(KEY_LEFT_ALT); Keyboard.press(KEY_LEFT_SHIFT); Keyboard.press(ArgChar); }
-        else if(Command=="ALT-GUI") { Keyboard.press(KEY_LEFT_ALT); Keyboard.press(KEY_LEFT_GUI); Keyboard.press(ArgChar); }
-        else if(Command=="GUI-SHIFT") { Keyboard.press(KEY_LEFT_GUI); Keyboard.press(KEY_LEFT_SHIFT); Keyboard.press(ArgChar); }
+        else if(Command=="CTRL-ALT") { Keyboard.press(KEYLEFT_ALT); Keyboard.press(KEYLEFT_CTRL); Keyboard.press(ArgChar); }
+        else if(Command=="CTRL-SHIFT") { Keyboard.press(KEYLEFT_CTRL); Keyboard.press(KEYLEFT_SHIFT); Keyboard.press(ArgChar); }
+        else if(Command=="ALT-SHIFT") { Keyboard.press(KEYLEFT_ALT); Keyboard.press(KEYLEFT_SHIFT); Keyboard.press(ArgChar); }
+        else if(Command=="ALT-GUI") { Keyboard.press(KEYLEFT_ALT); Keyboard.press(KEYLEFT_GUI); Keyboard.press(ArgChar); }
+        else if(Command=="GUI-SHIFT") { Keyboard.press(KEYLEFT_GUI); Keyboard.press(KEYLEFT_SHIFT); Keyboard.press(ArgChar); }
           
-        else if(Command=="ENTER") Keyboard.press(KEY_RETURN);
+        else if(Command=="ENTER") Keyboard.press(KEYRETURN);
         else if(Command=="DOWNARROW") Keyboard.press(KEYDOWN_ARROW);
         else if(Command=="DOWN") Keyboard.press(KEYDOWN_ARROW);
         else if(Command=="LEFTARROW") Keyboard.press(KEYLEFT_ARROW);
@@ -213,23 +220,23 @@ void key_input(String bad_script = "/badpayload.txt")
         else if(Command=="RIGHT") Keyboard.press(KEYRIGHT_ARROW);
         else if(Command=="UPARROW") Keyboard.press(KEYUP_ARROW);
         else if(Command=="UP") Keyboard.press(KEYUP_ARROW);
-        else if(Command=="BREAK") Keyboard.press(KEY_PAUSE);
-        else if(Command=="CAPSLOCK") Keyboard.press(KEY_CAPS_LOCK);
-        else if(Command=="PAUSE") Keyboard.press(KEY_PAUSE);
-        else if(Command=="DELETE") Keyboard.press(KEY_DELETE);
+        else if(Command=="BREAK") Keyboard.press(KEYPAUSE);
+        else if(Command=="CAPSLOCK") Keyboard.press(KEYCAPS_LOCK);
+        else if(Command=="PAUSE") Keyboard.press(KEYPAUSE);
+        else if(Command=="DELETE") Keyboard.press(KEYDELETE);
         else if(Command=="BACKSPACE") Keyboard.press(KEYBACKSPACE);
-        else if(Command=="END") Keyboard.press(KEY_END);
+        else if(Command=="END") Keyboard.press(KEYEND);
         else if(Command=="ESC" || Command=="ESCAPE") Keyboard.press(KEYESC);
-        else if(Command=="HOME") Keyboard.press(KEY_HOME);
-        else if(Command=="INSERT") Keyboard.press(KEY_INSERT);
-        else if(Command=="NUMLOCK") Keyboard.press(KEY_NUM_LOCK);
-        else if(Command=="PAGEUP") Keyboard.press(KEY_PAGE_UP);
-        else if(Command=="PAGEDOWN") Keyboard.press(KEY_PAGE_DOWN);
-        else if(Command=="PRINTSCREEN") Keyboard.press(KEY_PRINT_SCREEN);
-        else if(Command=="SCROLLOCK") Keyboard.press(KEY_SCROLL_LOCK);
+        else if(Command=="HOME") Keyboard.press(KEYHOME);
+        else if(Command=="INSERT") Keyboard.press(KEYINSERT);
+        else if(Command=="NUMLOCK") Keyboard.press(KEYNUM_LOCK);
+        else if(Command=="PAGEUP") Keyboard.press(KEYPAGE_UP);
+        else if(Command=="PAGEDOWN") Keyboard.press(KEYPAGE_DOWN);
+        else if(Command=="PRINTSCREEN") Keyboard.press(KEYPRINT_SCREEN);
+        else if(Command=="SCROLLOCK") Keyboard.press(KEYSCROLL_LOCK);
         //else if(Command=="SPACE") Keyboard.press(' '); //Supported on Flipper but not here, yet
         else if(Command=="TAB") Keyboard.press(KEYTAB);
-        else if(Command=="MENU") Keyboard.press(KEY_MENU);
+        else if(Command=="MENU") Keyboard.press(KEYMENU);
         //else if(Command=="APP") Keyboard.press(APP); //Supported on Flipper but not here, yet
         //else if(Command=="SYSRQ") Keyboard.press(SYSRQ); //Supported on Flipper but not here, yet
         else if(Command=="F1") Keyboard.press(KEYF1);          
@@ -257,12 +264,12 @@ void key_input(String bad_script = "/badpayload.txt")
     Serial.println("rick");
     DISP.setCursor(0, 40);
     DISP.println("rick");
-    Keyboard.press(KEY_LEFT_GUI);
+    Keyboard.press(KEYLEFT_GUI);
     Keyboard.press('r');
     Keyboard.releaseAll();
     delay(1000);
     Keyboard.print("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-    Keyboard.press(KEY_RETURN);
+    Keyboard.press(KEYRETURN);
     Keyboard.releaseAll();
   }
 
@@ -275,7 +282,7 @@ void key_input(String bad_script = "/badpayload.txt")
 void usb_setup()
 {
   Serial.println("BadUSB begin");
-  DISP.clear();
+  DISP.fillScreen(BLACK);
   DISP.setTextColor(WHITE, BGCOLOR);
   DISP.setCursor(0, 0);
   int rot = 3;
@@ -476,6 +483,8 @@ void usb_loop()
 
 }
 
+
+#ifdef CARDPUTER
 /*
 
 Now cardputer works as a USB Keyboard!
@@ -541,6 +550,7 @@ void keyboard_loop() {
     }
 }
 
+
 // BLE KEYBOARD
 // from https://github.com/T-vK/ESP32-BLE-Keyboard
 
@@ -569,7 +579,7 @@ void ble_loop() {
     //delay(1000);
 
     //Serial.println("Sending Enter key...");
-    //bleKeyboard.write(KEY_RETURN);
+    //bleKeyboard.write(KEYRETURN);
 
     //delay(1000);
 
@@ -583,9 +593,9 @@ void ble_loop() {
    // which by default is commented out. 
    // 
    /* Serial.println("Sending Ctrl+Alt+Delete...");
-    bleKeyboard.press(KEY_LEFT_CTRL);
-    bleKeyboard.press(KEY_LEFT_ALT);
-    bleKeyboard.press(KEY_DELETE);
+    bleKeyboard.press(KEYLEFT_CTRL);
+    bleKeyboard.press(KEYLEFT_ALT);
+    bleKeyboard.press(KEYDELETE);
     delay(100);
     bleKeyboard.releaseAll();
     */
@@ -594,3 +604,4 @@ void ble_loop() {
   //Serial.println("Waiting 5 seconds...");
   //delay(5000);
 }
+#endif
