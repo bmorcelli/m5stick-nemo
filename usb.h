@@ -1,14 +1,12 @@
-
+#ifdef CARDPUTER
 #include <USB.h>
 #include <SPI.h>
 #include <time.h>
 
-#ifdef CARDPUTER
-	#include <USBHIDKeyboard.h>
-	USBHIDKeyboard Keyboard;
-#else
-	#include <Keyboard.h>
-#endif
+
+#include <USBHIDKeyboard.h>
+USBHIDKeyboard Keyboard;
+
 
 //#include <BleKeyboard.h>
 //BleKeyboard bleKeyboard;
@@ -604,4 +602,5 @@ void ble_loop() {
   //Serial.println("Waiting 5 seconds...");
   //delay(5000);
 }
+#endif
 #endif
