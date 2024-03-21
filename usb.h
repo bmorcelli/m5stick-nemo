@@ -139,7 +139,7 @@ void key_input(String bad_script = "/badpayload.txt")
       String lineContent = "";
       String Command = "";
       String Argument = "";
-      Char Argchar;
+      char Argchar;
       Keyboard.releaseAll();
       while (payloadFile.available()) {
         lineContent = payloadfile.readStringUntil('\n');
@@ -241,176 +241,176 @@ void usb_setup()
   String bad_script = "";
 
   while(1) {
-  // DRAW file list ==============================================================================================================
-  if (needRedraw == true) {
-    startIndex = selectIndex - 5;
-    if (startIndex < 0) {
-      startIndex = 0;
-    }
-    endIndex = startIndex + dispfileCount;
-    if (endIndex >= (fileListCount + folderListCount)) {
-      endIndex = fileListCount + folderListCount + 1;
-      if (PreFolder != "/") { endIndex++; }
-      if (selectIndex>6) {
-        startIndex = selectIndex - 6;
-      }
-      else {
-        startIndex = 0;
-      }
-    }
-    if (fileListCount == 0 && folderListCount == 0 && PreFolder == "/") {
-      LNDISP.fillScreen(BLACK);
-      LNDISP.setCursor(0, 0);
-      LNDISP.setTextColor(RED,WHITE);
-      LNDISP.println("\nSD is empty or there\nare no .bin in root.\nExample: d:\\File.bin");
-      delay(2000);
-      readFs("/");
-    } else {
-      LNDISP.fillScreen(BLACK);
-      LNDISP.setCursor(0, 0);
-      for (int index = startIndex; index <= (endIndex + 1); index++) {
-        LNDISP.setTextColor(WHITE, BLACK); // RESET BG COLOR TO BLACK
-        if (index == selectIndex) {
-          if (index == 0){
-            LNDISP.setTextColor(BLACK, WHITE);
-            LNDISP.print(">");
-          } else if (index < folderListCount+1) {
-            LNDISP.setTextColor(BLUE);  // folders selected in Blue
-            LNDISP.print(">");
-          } else if (index < (folderListCount + fileListCount+1)){
-            LNDISP.setTextColor(GREEN);  // files selected in Green
-            LNDISP.print(">");
-          } else if (index == (folderListCount + fileListCount+1)){
-            if (PreFolder != "/") {
-              LNDISP.setTextColor(RED, WHITE);  // folders in yellow
-              LNDISP.print("<");
-            }
-        }
-        } else {
-	  if (index == 0){
-	    LNDISP.setTextColor(WHITE);
-	    LNDISP.print(" ");
-	  } else if (index < folderListCount+1) {
-            LNDISP.setTextColor(YELLOW);  // folders in yellow
-            LNDISP.print(" ");
-          } else if (index < (folderListCount + fileListCount+1)){
-            LNDISP.setTextColor(WHITE);  // files in white
-            LNDISP.print(" ");
-          } else if (index == (folderListCount + fileListCount+1)){
-            if (PreFolder != "/") {
-              LNDISP.setTextColor(RED, BLACK);  // folders in yellow
-              LNDISP.print(" ");
-            }
-          }
-        }
-	if (index==0) {
-	  LNDISP.println(">> Send default    ");
-	} else if (index < folderListCount+1) {
-          LNDISP.println(folderList[index-1].substring(0, 15) + "/");
-        } else if (index < (folderListCount + fileListCount+1)) {
-          LNDISP.println(fileList[index - folderListCount-1].substring(0, 16));
-        } else if (PreFolder != "/") { 
-          LNDISP.print("<< back            ");
-          break;
-        } else { break; } 
-      }
-    }
-    needRedraw = false;
-    delay(150);
-  }
-
-  // END of DRAW file list ============================================================================================================
-
-// push Button Detection ==============================================================================================================
-M5.update();
-#if defined(STICK_C_PLUS2)
-  if (digitalRead(M5_BUTTON_MENU) == LOW) ClickPwrBtn = true; // Power Button
-#endif
-#if defined(STICK_C_PLUS) || defined(STICK_C)
-  if (M5.Axp.GetBtnPress()) ClickPwrBtn = true;  // Power Button
-#endif
-#if defined(STICK_C_PLUS) || defined(STICK_C) || defined(STICK_C_PLUS2)
-  if (M5.BtnB.wasPressed())  ClickSideBtn = true; // Side Button
-#endif
-
-
-#if defined(CARDPUTER)
-  M5Cardputer.update();
-  if (M5Cardputer.Keyboard.isKeyPressed('.'))  //Arrow Up
-#else
-  if ((ClickPwrBtn==true && rot==1) || (ClickSideBtn==true && rot==3))
-#endif
-      {
-        selectIndex++;
-        if (selectIndex > (fileListCount + folderListCount + 1) || (selectIndex == (fileListCount + folderListCount + 1) && PreFolder == "/")) {
-        selectIndex = 0;
-        }
-      #ifndef CARDPUTER
-        ClickPwrBtn=false;
-        ClickSideBtn=false;
-      #endif
-        needRedraw = true;
-        delay(100);
-      }
-
-#if defined(CARDPUTER)
-  M5Cardputer.update();
-  if (M5Cardputer.Keyboard.isKeyPressed(';'))        // Arrow Down
-#else
-  if ((ClickPwrBtn==true && rot==3) || (ClickSideBtn==true && rot==1))
-#endif
-  {
-      selectIndex--;
-      if (selectIndex < 0) {
-        selectIndex = fileListCount + folderListCount - 1 + 1;
-        if(PreFolder!="/") {selectIndex++;}
-      }
-    #ifndef CARDPUTER
-      ClickPwrBtn=false;
-      ClickSideBtn=false;
-    #endif
-      needRedraw = true;
-      delay(100);
-  }  
-
-// END of push Button Detection ===========================================================================================================
-  
-// File Selection =========================================================================================================================
-#if defined(STICK_C_PLUS2) || defined(STICK_C_PLUS) || defined(STICK_C)
-  if (M5.BtnA.wasPressed())  // M5 button
-#else
-  M5Cardputer.update();
-  if (M5Cardputer.Keyboard.isKeyPressed(KEY_ENTER))  // Enter
-#endif
-  {
-    if (selectIndex==0) { //when Default is selected
-		  LNDISP.fillScreen(BLACK);
-		  #if defined(STICK_C) || defined(STICK_C_PLUS)
-		  M5.Axp.ScreenBreath(7);
-		  #else
-		  LNDISP.setBrightness(0);
-		  #endif
-		  bad_script = "/badpayload.txt";
-      break;
-      
-    } else if (selectIndex < (folderListCount +1 )) { //When select a Folder
-		  if(PreFolder=="/") { PreFolder = PreFolder + folderList[selectIndex - 1]; }
-		  else { PreFolder = PreFolder + "/" + folderList[selectIndex - 1]; }
-		  selectIndex=0;
-		  readFs(PreFolder);
-
-    } else if (fileList[selectIndex - folderListCount - 1] == "") { // When press Back btn
-		  PreFolder = PreFolder.substring(0, PreFolder.lastIndexOf("/"));
-		  if(PreFolder == ""){ PreFolder = "/"; }
-		  selectIndex=0;
-		  readFs(PreFolder);
+	  // DRAW file list ==============================================================================================================
+	  if (needRedraw == true) {
+	    startIndex = selectIndex - 5;
+	    if (startIndex < 0) {
+	      startIndex = 0;
+	    }
+	    endIndex = startIndex + dispfileCount;
+	    if (endIndex >= (fileListCount + folderListCount)) {
+	      endIndex = fileListCount + folderListCount + 1;
+	      if (PreFolder != "/") { endIndex++; }
+	      if (selectIndex>6) {
+	        startIndex = selectIndex - 6;
+	      }
+	      else {
+	        startIndex = 0;
+	      }
+	    }
+	    if (fileListCount == 0 && folderListCount == 0 && PreFolder == "/") {
+	      LNDISP.fillScreen(BLACK);
+	      LNDISP.setCursor(0, 0);
+	      LNDISP.setTextColor(RED,WHITE);
+	      LNDISP.println("\nSD is empty or there\nare no .bin in root.\nExample: d:\\File.bin");
+	      delay(2000);
+	      readFs("/");
+	    } else {
+	      LNDISP.fillScreen(BLACK);
+	      LNDISP.setCursor(0, 0);
+	      for (int index = startIndex; index <= (endIndex + 1); index++) {
+	        LNDISP.setTextColor(WHITE, BLACK); // RESET BG COLOR TO BLACK
+	        if (index == selectIndex) {
+	          if (index == 0){
+	            LNDISP.setTextColor(BLACK, WHITE);
+	            LNDISP.print(">");
+	          } else if (index < folderListCount+1) {
+	            LNDISP.setTextColor(BLUE);  // folders selected in Blue
+	            LNDISP.print(">");
+	          } else if (index < (folderListCount + fileListCount+1)){
+	            LNDISP.setTextColor(GREEN);  // files selected in Green
+	            LNDISP.print(">");
+	          } else if (index == (folderListCount + fileListCount+1)){
+	            if (PreFolder != "/") {
+	              LNDISP.setTextColor(RED, WHITE);  // folders in yellow
+	              LNDISP.print("<");
+	            }
+	        }
+	        } else {
+		  if (index == 0){
+		    LNDISP.setTextColor(WHITE);
+		    LNDISP.print(" ");
+		  } else if (index < folderListCount+1) {
+	            LNDISP.setTextColor(YELLOW);  // folders in yellow
+	            LNDISP.print(" ");
+	          } else if (index < (folderListCount + fileListCount+1)){
+	            LNDISP.setTextColor(WHITE);  // files in white
+	            LNDISP.print(" ");
+	          } else if (index == (folderListCount + fileListCount+1)){
+	            if (PreFolder != "/") {
+	              LNDISP.setTextColor(RED, BLACK);  // folders in yellow
+	              LNDISP.print(" ");
+	            }
+	          }
+	        }
+		if (index==0) {
+		  LNDISP.println(">> Send default    ");
+		} else if (index < folderListCount+1) {
+	          LNDISP.println(folderList[index-1].substring(0, 15) + "/");
+	        } else if (index < (folderListCount + fileListCount+1)) {
+	          LNDISP.println(fileList[index - folderListCount-1].substring(0, 16));
+	        } else if (PreFolder != "/") { 
+	          LNDISP.print("<< back            ");
+	          break;
+	        } else { break; } 
+	      }
+	    }
+	    needRedraw = false;
+	    delay(150);
+	  }
 	
-    } else { // when select a file
-      bad_script = PreFolder + "/" + fileList[selectIndex - folderListCount - 1];
-      break; // Exit while andd start bad USB
-    }
+	  // END of DRAW file list ============================================================================================================
+	
+	// push Button Detection ==============================================================================================================
+	M5.update();
+	#if defined(STICK_C_PLUS2)
+	  if (digitalRead(M5_BUTTON_MENU) == LOW) ClickPwrBtn = true; // Power Button
+	#endif
+	#if defined(STICK_C_PLUS) || defined(STICK_C)
+	  if (M5.Axp.GetBtnPress()) ClickPwrBtn = true;  // Power Button
+	#endif
+	#if defined(STICK_C_PLUS) || defined(STICK_C) || defined(STICK_C_PLUS2)
+	  if (M5.BtnB.wasPressed())  ClickSideBtn = true; // Side Button
+	#endif
+	
+	
+	#if defined(CARDPUTER)
+	  M5Cardputer.update();
+	  if (M5Cardputer.Keyboard.isKeyPressed('.'))  //Arrow Up
+	#else
+	  if ((ClickPwrBtn==true && rot==1) || (ClickSideBtn==true && rot==3))
+	#endif
+	      {
+	        selectIndex++;
+	        if (selectIndex > (fileListCount + folderListCount + 1) || (selectIndex == (fileListCount + folderListCount + 1) && PreFolder == "/")) {
+	        selectIndex = 0;
+	        }
+	      #ifndef CARDPUTER
+	        ClickPwrBtn=false;
+	        ClickSideBtn=false;
+	      #endif
+	        needRedraw = true;
+	        delay(100);
+	      }
+	
+	#if defined(CARDPUTER)
+	  M5Cardputer.update();
+	  if (M5Cardputer.Keyboard.isKeyPressed(';'))        // Arrow Down
+	#else
+	  if ((ClickPwrBtn==true && rot==3) || (ClickSideBtn==true && rot==1))
+	#endif
+	  {
+	      selectIndex--;
+	      if (selectIndex < 0) {
+	        selectIndex = fileListCount + folderListCount - 1 + 1;
+	        if(PreFolder!="/") {selectIndex++;}
+	      }
+	    #ifndef CARDPUTER
+	      ClickPwrBtn=false;
+	      ClickSideBtn=false;
+	    #endif
+	      needRedraw = true;
+	      delay(100);
+	  }  
+	
+	// END of push Button Detection ===========================================================================================================
+	  
+	// File Selection =========================================================================================================================
+	#if defined(STICK_C_PLUS2) || defined(STICK_C_PLUS) || defined(STICK_C)
+	  if (M5.BtnA.wasPressed())  // M5 button
+	#else
+	  M5Cardputer.update();
+	  if (M5Cardputer.Keyboard.isKeyPressed(KEY_ENTER))  // Enter
+	#endif
+	  {
+	    if (selectIndex==0) { //when Default is selected
+			  LNDISP.fillScreen(BLACK);
+			  #if defined(STICK_C) || defined(STICK_C_PLUS)
+			  M5.Axp.ScreenBreath(7);
+			  #else
+			  LNDISP.setBrightness(0);
+			  #endif
+			  bad_script = "/badpayload.txt";
+	      break;
+	      
+	    } else if (selectIndex < (folderListCount +1 )) { //When select a Folder
+			  if(PreFolder=="/") { PreFolder = PreFolder + folderList[selectIndex - 1]; }
+			  else { PreFolder = PreFolder + "/" + folderList[selectIndex - 1]; }
+			  selectIndex=0;
+			  readFs(PreFolder);
+	
+	    } else if (fileList[selectIndex - folderListCount - 1] == "") { // When press Back btn
+			  PreFolder = PreFolder.substring(0, PreFolder.lastIndexOf("/"));
+			  if(PreFolder == ""){ PreFolder = "/"; }
+			  selectIndex=0;
+			  readFs(PreFolder);
+		
+	    } else { // when select a file
+	      bad_script = PreFolder + "/" + fileList[selectIndex - folderListCount - 1];
+	      break; // Exit while andd start bad USB
+	    }
+	  }
   }
-
   DISP.setTextSize(MEDIUM_TEXT);  
   DISP.println("Sending...");
 
