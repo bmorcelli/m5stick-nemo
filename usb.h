@@ -5,7 +5,9 @@
 
 
 #include <USBHIDKeyboard.h>
+
 USBHIDKeyboard Keyboard;
+
 //#include <BleKeyboard.h>
 //BleKeyboard bleKeyboard;
 //
@@ -18,6 +20,39 @@ USBHIDKeyboard Keyboard;
 #define KEY_PRINT_SCREEN 0xCE
 #define KEY_SCROLL_LOCK 0xCF
 #define KEY_MENU 0xED
+#define KEY_LEFT_CTRL  0x80
+#define KEY_LEFT_SHIFT 0x81
+#define KEY_LEFT_ALT   0x82
+#define KEY_LEFT_GUI   0x83
+#define KEYBACKSPACE 0xB2
+#define KEYTAB       0xB3
+#define KEY_ENTER     0x28
+#define KEY_RETURN 0xB0
+#define KEY_INSERT 0xD1
+#define KEY_DELETE 0xD4
+#define KEY_HOME 0xD2
+#define KEY_END 0xD5
+#define KEY_PAGE_UP 0xD3
+#define KEY_PAGE_DOWN 0xD6
+#define KEYUP_ARROW 0xDA
+#define KEYDOWN_ARROW 0xD9
+#define KEYLEFT_ARROW 0xD8
+#define KEYRIGHT_ARROW 0xD7
+
+#define KEYESC 0xB1
+#define KEYF1 0xC2
+#define KEYF2 0xC3
+#define KEYF3 0xC4
+#define KEYF4 0xC5
+#define KEYF5 0xC6
+#define KEYF6 0xC7
+#define KEYF7 0xC8
+#define KEYF8 0xC9
+#define KEYF9 0xCA
+#define KEYF10 0xCB
+#define KEYF11 0xCC
+#define KEYF12 0xCD
+
 
 File fileRoot;
 File root;
@@ -170,21 +205,21 @@ void key_input(String bad_script = "/badpayload.txt")
         else if(Command=="GUI-SHIFT") { Keyboard.press(KEY_LEFT_GUI); Keyboard.press(KEY_LEFT_SHIFT); Keyboard.press(ArgChar); }
           
         else if(Command=="ENTER") Keyboard.press(KEY_RETURN);
-        else if(Command=="DOWNARROW") Keyboard.press(KEY_DOWN_ARROW);
-        else if(Command=="DOWN") Keyboard.press(KEY_DOWN_ARROW);
-        else if(Command=="LEFTARROW") Keyboard.press(KEY_LEFT_ARROW);
-        else if(Command=="LEFT") Keyboard.press(KEY_LEFT_ARROW);
-        else if(Command=="RIGHTARROW") Keyboard.press(KEY_RIGHT_ARROW);
-        else if(Command=="RIGHT") Keyboard.press(KEY_RIGHT_ARROW);
-        else if(Command=="UPARROW") Keyboard.press(KEY_UP_ARROW);
-        else if(Command=="UP") Keyboard.press(KEY_UP_ARROW);
+        else if(Command=="DOWNARROW") Keyboard.press(KEYDOWN_ARROW);
+        else if(Command=="DOWN") Keyboard.press(KEYDOWN_ARROW);
+        else if(Command=="LEFTARROW") Keyboard.press(KEYLEFT_ARROW);
+        else if(Command=="LEFT") Keyboard.press(KEYLEFT_ARROW);
+        else if(Command=="RIGHTARROW") Keyboard.press(KEYRIGHT_ARROW);
+        else if(Command=="RIGHT") Keyboard.press(KEYRIGHT_ARROW);
+        else if(Command=="UPARROW") Keyboard.press(KEYUP_ARROW);
+        else if(Command=="UP") Keyboard.press(KEYUP_ARROW);
         else if(Command=="BREAK") Keyboard.press(KEY_PAUSE);
         else if(Command=="CAPSLOCK") Keyboard.press(KEY_CAPS_LOCK);
         else if(Command=="PAUSE") Keyboard.press(KEY_PAUSE);
         else if(Command=="DELETE") Keyboard.press(KEY_DELETE);
-        else if(Command=="BACKSPACE") Keyboard.press(KEY_BACKSPACE);
+        else if(Command=="BACKSPACE") Keyboard.press(KEYBACKSPACE);
         else if(Command=="END") Keyboard.press(KEY_END);
-        else if(Command=="ESC" || Command=="ESCAPE") Keyboard.press(KEY_ESC);
+        else if(Command=="ESC" || Command=="ESCAPE") Keyboard.press(KEYESC);
         else if(Command=="HOME") Keyboard.press(KEY_HOME);
         else if(Command=="INSERT") Keyboard.press(KEY_INSERT);
         else if(Command=="NUMLOCK") Keyboard.press(KEY_NUM_LOCK);
@@ -193,22 +228,22 @@ void key_input(String bad_script = "/badpayload.txt")
         else if(Command=="PRINTSCREEN") Keyboard.press(KEY_PRINT_SCREEN);
         else if(Command=="SCROLLOCK") Keyboard.press(KEY_SCROLL_LOCK);
         //else if(Command=="SPACE") Keyboard.press(' '); //Supported on Flipper but not here, yet
-        else if(Command=="TAB") Keyboard.press(KEY_TAB);
+        else if(Command=="TAB") Keyboard.press(KEYTAB);
         else if(Command=="MENU") Keyboard.press(KEY_MENU);
         //else if(Command=="APP") Keyboard.press(APP); //Supported on Flipper but not here, yet
         //else if(Command=="SYSRQ") Keyboard.press(SYSRQ); //Supported on Flipper but not here, yet
-        else if(Command=="F1") Keyboard.press(KEY_F1);          
-        else if(Command=="F2") Keyboard.press(KEY_F2);
-        else if(Command=="F3") Keyboard.press(KEY_F3);
-        else if(Command=="F4") Keyboard.press(KEY_F4);
-        else if(Command=="F5") Keyboard.press(KEY_F5);
-        else if(Command=="F6") Keyboard.press(KEY_F6);
-        else if(Command=="F7") Keyboard.press(KEY_F7);
-        else if(Command=="F8") Keyboard.press(KEY_F8);
-        else if(Command=="F9") Keyboard.press(KEY_F9);
-        else if(Command=="F10") Keyboard.press(KEY_F10);  
-        else if(Command=="F11") Keyboard.press(KEY_F11);
-        else if(Command=="F12") Keyboard.press(KEY_F12);
+        else if(Command=="F1") Keyboard.press(KEYF1);          
+        else if(Command=="F2") Keyboard.press(KEYF2);
+        else if(Command=="F3") Keyboard.press(KEYF3);
+        else if(Command=="F4") Keyboard.press(KEYF4);
+        else if(Command=="F5") Keyboard.press(KEYF5);
+        else if(Command=="F6") Keyboard.press(KEYF6);
+        else if(Command=="F7") Keyboard.press(KEYF7);
+        else if(Command=="F8") Keyboard.press(KEYF8);
+        else if(Command=="F9") Keyboard.press(KEYF9);
+        else if(Command=="F10") Keyboard.press(KEYF10);  
+        else if(Command=="F11") Keyboard.press(KEYF11);
+        else if(Command=="F12") Keyboard.press(KEYF12);
         else Serial.println("Command:" + Command + " not suported");
 
         if(Command!="REM") delay(DEF_DELAY); //if command is not a comment, wait DEF_DELAY until next command (100ms)
@@ -246,6 +281,8 @@ void usb_setup()
   int rot = 3;
   int dispfileCount = 8;
   String bad_script = "";
+  bool ClickPwrBtn=false;
+  bool ClickSideBtn=false;
 
   while(1) {
 	  // DRAW file list ==============================================================================================================
